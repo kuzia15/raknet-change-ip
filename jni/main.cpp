@@ -12,6 +12,25 @@ JNIEnv *mEnv;
 #define CUSTOM_RPC 251
 #define PACKET_HELLOWORLD 1
 
+void (*CNetGame__CNetGame)(char *a1, const char *a2, int a3, const char *a4, int a5);
+void CNetGame__CNetGame_hook(char *a1, const char *a2, int a3, const char *a4, int a5)
+{
+   Log("a1 -> %s", a1);
+
+   Log("a2 -> %s", a2);
+   a2 = WEIKTON("127.0.0.1");
+   Log("a2 ->-> %s", a2);
+
+   Log("a3 -> %d", a3);
+   a3 = 7777;
+   Log("a3 ->-> %d", a3);
+
+   Log("a4 -> %s", a4);
+   Log("a5 -> %d", a5);
+
+   CNetGame__CNetGame(a1, a2, a3, a4, a5);
+}
+
 void Packet_CustomRPC(Packet* p)
 {
     RakNet::BitStream bs((unsigned char*)p->data, p->length, false);
@@ -69,12 +88,22 @@ int CNetGame__UpdateNetwork_hook(uintptr_t *data)
 
 void initSamp() 
 {
+    ARMHook::installHook(g_libSAMP + 0x0, (uintptr_t)CNetGame__CNetGame_hook, (uintptr_t*)&CNetGame__CNetGame);
     CHook::InlineHook(g_libSAMP, 0x0, (uintptr_t)CNetGame__UpdateNetwork_hook, (uintptr_t*)&CNetGame__UpdateNetwork);
 }
 
 void Main() 
 {
-     // code for GTASA
+    const char* thumb = OBFUSCATE("texdb/%s/%s.etc.tmb");
+    ARMHook::writeMem(g_libGTASA + 0x573648,(int) thumb, 20);
+    ARMHook::writeMem(g_libGTASA + 0x57365C,(int) thumb, 20);
+    ARMHook::writeMem(g_libGTASA + 0x573670,(int) thumb, 20);
+    ARMHook::writeMem(g_libGTASA + 0x573684,(int) thumb, 20);
+    const char* dataoff = OBFUSCATE("texdb/%s/%s.etc");
+    ARMHook::writeMem(g_libGTASA + 0x5736AC,(int) dataoff, 16);
+    ARMHook::writeMem(g_libGTASA + 0x5736BC,(int) dataoff, 16);
+    ARMHook::writeMem(g_libGTASA + 0x5736CC,(int) dataoff, 16);
+    ARMHook::writeMem(g_libGTASA + 0x5736DC,(int) dataoff, 16);
 }
 
 void *InitialiseThread(void *p)
@@ -111,12 +140,11 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved)
     if(appContext != NULL) 
 	{ 
         g_pAPKPackage = mEnv->GetStringUTFChars(GetPackageName(mEnv, appContext), NULL);
-		toasty(OBFUSCATE("WNRPC"));
 
         char sea_of_feelings[100+1];
 		sprintf(sea_of_feelings, OBFUSCATE("Package: %s"), g_pAPKPackage);
 
-		__android_log_write(ANDROID_LOG_INFO, OBFUSCATE("WNPath"), OBFUSCATE("Powered by Weikton"));
+		__android_log_write(ANDROID_LOG_INFO, OBFUSCATE("WNPath"), OBFUSCATE("Hello "));
 		__android_log_write(ANDROID_LOG_INFO, OBFUSCATE("WNPath"), sea_of_feelings);
     }
     
