@@ -15,5 +15,3 @@
 * Optimized cache for all devices (etc)
 
 Requires: ndk 16+, android 11+
-
-To do: turn signals, audiostream, crashfix.
