@@ -14,4 +14,6 @@
 * Calling any Java class without interfering with the APK
 * Optimized cache for all devices (etc)
 
-# TODO: arm64 support
+Requires: ndk 16+, android 11+
+
+To do: turn signals, audiostream, crashfix.
